@@ -68,16 +68,16 @@ export const formatMenu = list => {
       query:
         item.path.indexOf("?") > -1
           ? {
-              [item.path
+            [item.path
+              .split("?")
+              .pop()
+              .split("=")
+              .shift()]: item.path
                 .split("?")
                 .pop()
                 .split("=")
-                .shift()]: item.path
-                .split("?")
                 .pop()
-                .split("=")
-                .pop()
-            }
+          }
           : undefined,
       name: item.name,
       icon: (item.meta && item.meta.icon) || ""

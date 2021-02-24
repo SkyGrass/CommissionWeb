@@ -23,6 +23,7 @@
               style="width: 165px"
               placeholder="请选择日期"
               v-model="formModel.fields.fDate"
+              :readonly="!canEdit"
             ></DatePicker> </FormItem
         ></Col>
         <Col span="3">
@@ -31,6 +32,7 @@
               style="width: 162px"
               clearable
               v-model="formModel.fields.fCustomId"
+              :disabled="!canEdit"
               placeholder="请选择客户"
             >
               <Option
@@ -69,6 +71,7 @@
               clearable
               v-model="formModel.fields.fConfirmerId"
               placeholder="请选择经办人"
+              :disabled="!canEdit"
             >
               <Option
                 v-for="item in salesmans"
@@ -80,11 +83,12 @@
           </FormItem></Col
         >
         <Col span="3">
-          <FormItem label="计提" prop="fisCommisionV">
+          <FormItem label="计提" prop="fisCommissionV">
             <Select
               style="width: 162px"
-              v-model="formModel.fields.fisCommisionV"
+              v-model="formModel.fields.fisCommissionV"
               placeholder="请选择是否计提"
+              :disabled="!canEdit"
             >
               <Option value="1">计提</Option>
               <Option value="0">不计提</Option>
@@ -98,18 +102,21 @@
             <Input
               v-model="formModel.fields.fRemark"
               type="textarea"
+              :readonly="!canEdit"
               :autosize="{ minRows: 1, maxRows: 1 }"
               placeholder="请在此输入备注..."
             ></Input>
           </FormItem>
         </Col>
         <Col span="2"
-          ><Button type="info" @click="handleSubmit">保存</Button></Col
+          ><Button type="info" @click="handleSubmit" v-show="canEdit"
+            >保存</Button
+          ></Col
         >
       </Row>
     </Form>
     <Card>
-      <ButtonGroup style="margin-bottom: 10px">
+      <ButtonGroup style="margin-bottom: 10px" v-show="canEdit">
         <Button type="primary" size="small" @click="newRow">新行</Button>
         <Button type="error" size="small" @click="deleteRow">删行</Button>
       </ButtonGroup>
@@ -129,7 +136,7 @@
 </template>
 <script>
 import { getSoftWareSelectList } from "@/api/base/software";
-import { genBillNo } from "@/api/bus/record";
+import { genBillNo, loadRecord, loadRecordEntry } from "@/api/bus/record";
 import { getAllCustom } from "@/api/base/custom";
 import { getAllSalesman } from "@/api/base/saleman";
 import { getBindUser } from "@/api/rbac/user";
@@ -148,7 +155,7 @@ export default {
           fDate: dayjs(new Date()).format("YYYY-MM-DD"),
           fCustomId: -1,
           fsalesmanId: -1,
-          fisCommisionV: "1",
+          fisCommissionV: "1",
           fremark: "",
           fisAudit: 0,
         },
@@ -201,7 +208,7 @@ export default {
       columns: [
         {
           width: 250,
-          key: "FSoftwareId",
+          key: "fSoftwareId",
           title: "软件系列",
           align: "center",
           render: (h, params) => {
@@ -210,35 +217,48 @@ export default {
               column: { key },
               index,
             } = params;
-            return h("div", [
-              h(
-                "Select",
-                {
-                  props: {
-                    transfer: true,
-                    value: row[key],
-                  },
-                  on: {
-                    "on-change": (e) => {
-                      this.list[index][key] = e;
-                    },
-                  },
-                },
-                this.softwares.map((item) => {
-                  return h("Option", {
-                    props: {
-                      value: item.value,
-                      label: item.text,
-                    },
-                  });
-                })
-              ),
-            ]);
+            const val = row[key];
+            const software = this.softwares.filter((f) => f.id == val);
+            console.log(software);
+            return h(
+              "div",
+              self.canEdit
+                ? [
+                    h(
+                      "Select",
+                      {
+                        props: {
+                          transfer: true,
+                          value: row[key],
+                        },
+                        on: {
+                          "on-change": (e) => {
+                            this.list[index][key] = e;
+                          },
+                        },
+                      },
+                      this.softwares.map((item) => {
+                        return h("Option", {
+                          props: {
+                            value: item.value,
+                            label: item.text,
+                          },
+                        });
+                      })
+                    ),
+                  ]
+                : [
+                    h(
+                      "div",
+                      software && software.length > 0 ? software[0]["name"] : ""
+                    ),
+                  ]
+            );
           },
         },
         {
           width: 250,
-          key: "FModule",
+          key: "fModule",
           title: "模块明细",
           align: "center",
           render: (h, params) => {
@@ -247,31 +267,37 @@ export default {
               column: { key },
               index,
             } = params;
-            return h("div", [
-              h(
-                "Input",
-                {
-                  props: {
-                    step: 1,
-                    value: this.list[index][key],
-                  },
-                  style: {
-                    width: "80%",
-                  },
-                  on: {
-                    input: (val) => {
-                      this.list[index][key] = val;
-                    },
-                  },
-                },
-                " "
-              ),
-            ]);
+            return h(
+              "div",
+              self.canEdit
+                ? [
+                    h(
+                      "Input",
+                      {
+                        props: {
+                          step: 1,
+                          value: this.list[index][key],
+                          disabled: !self.canEdit,
+                        },
+                        style: {
+                          width: "80%",
+                        },
+                        on: {
+                          input: (val) => {
+                            this.list[index][key] = val;
+                          },
+                        },
+                      },
+                      " "
+                    ),
+                  ]
+                : [h("div", this.list[index][key])]
+            );
           },
         },
         {
           width: 150,
-          key: "FContractPrice",
+          key: "fContractPrice",
           title: "合同总金额",
           align: "right",
           render: (h, params) => {
@@ -280,32 +306,38 @@ export default {
               column: { key },
               index,
             } = params;
-            return h("div", [
-              h(
-                "InputNumber",
-                {
-                  props: {
-                    step: 1,
-                    min: 0,
-                    value: this.list[index][key],
-                  },
-                  style: {
-                    width: "80%",
-                  },
-                  on: {
-                    "on-change": (e) => {
-                      this.list[index][key] = e;
-                    },
-                  },
-                },
-                " "
-              ),
-            ]);
+            return h(
+              "div",
+              self.canEdit
+                ? [
+                    h(
+                      "InputNumber",
+                      {
+                        props: {
+                          step: 1,
+                          min: 0,
+                          value: this.list[index][key],
+                          disabled: !self.canEdit,
+                        },
+                        style: {
+                          width: "80%",
+                        },
+                        on: {
+                          "on-change": (e) => {
+                            this.list[index][key] = e;
+                          },
+                        },
+                      },
+                      " "
+                    ),
+                  ]
+                : [h("div", this.list[index][key])]
+            );
           },
         },
         {
           width: 150,
-          key: "FStandardPrice",
+          key: "fStandardPrice",
           title: "模块标准价",
           align: "right",
           render: (h, params) => {
@@ -314,32 +346,38 @@ export default {
               column: { key },
               index,
             } = params;
-            return h("div", [
-              h(
-                "InputNumber",
-                {
-                  props: {
-                    step: 1,
-                    min: 0,
-                    value: this.list[index][key],
-                  },
-                  style: {
-                    width: "80%",
-                  },
-                  on: {
-                    "on-change": (e) => {
-                      this.list[index][key] = e;
-                    },
-                  },
-                },
-                " "
-              ),
-            ]);
+            return h(
+              "div",
+              self.canEdit
+                ? [
+                    h(
+                      "InputNumber",
+                      {
+                        props: {
+                          step: 1,
+                          min: 0,
+                          value: this.list[index][key],
+                          disabled: !self.canEdit,
+                        },
+                        style: {
+                          width: "80%",
+                        },
+                        on: {
+                          "on-change": (e) => {
+                            this.list[index][key] = e;
+                          },
+                        },
+                      },
+                      " "
+                    ),
+                  ]
+                : [h("div", this.list[index][key])]
+            );
           },
         },
         {
           width: 150,
-          key: "FDcRate",
+          key: "fDcRate",
           title: "成交折扣",
           align: "center",
           render: (h, params) => {
@@ -348,32 +386,38 @@ export default {
               column: { key },
               index,
             } = params;
-            return h("div", [
-              h(
-                "InputNumber",
-                {
-                  props: {
-                    step: 0.01,
-                    min: 0,
-                    value: this.list[index][key],
-                  },
-                  style: {
-                    width: "80%",
-                  },
-                  on: {
-                    "on-change": (e) => {
-                      this.list[index][key] = e;
-                    },
-                  },
-                },
-                " "
-              ),
-            ]);
+            return h(
+              "div",
+              self.canEdit
+                ? [
+                    h(
+                      "InputNumber",
+                      {
+                        props: {
+                          step: 0.01,
+                          min: 0,
+                          value: this.list[index][key],
+                          disabled: !self.canEdit,
+                        },
+                        style: {
+                          width: "80%",
+                        },
+                        on: {
+                          "on-change": (e) => {
+                            this.list[index][key] = e;
+                          },
+                        },
+                      },
+                      " "
+                    ),
+                  ]
+                : [h("div", this.list[index][key])]
+            );
           },
         },
         {
           width: 150,
-          key: "FPoints",
+          key: "fPoints",
           title: "本单积分",
           align: "center",
           render: (h, params) => {
@@ -382,36 +426,41 @@ export default {
               column: { key },
               index,
             } = params;
-            return h("div", [
-              h(
-                "InputNumber",
-                {
-                  props: {
-                    step: 1,
-                    value: this.list[index][key],
-                  },
-                  style: {
-                    width: "80%",
-                  },
-                  on: {
-                    "on-change": (e) => {
-                      this.list[index][key] = e;
-                    },
-                  },
-                },
-                " "
-              ),
-            ]);
+            return h(
+              "div",
+              self.canEdit
+                ? [
+                    h(
+                      "InputNumber",
+                      {
+                        props: {
+                          step: 1,
+                          value: this.list[index][key],
+                        },
+                        style: {
+                          width: "80%",
+                        },
+                        on: {
+                          "on-change": (e) => {
+                            this.list[index][key] = e;
+                          },
+                        },
+                      },
+                      " "
+                    ),
+                  ]
+                : [h("div", this.list[index][key])]
+            );
           },
         },
       ],
       form: {
-        FSoftwareId: -1,
-        FModule: "",
-        FContractPrice: 0,
-        FStandardPrice: 0,
-        FDcRate: 0,
-        FPoints: 0,
+        fSoftwareId: -1,
+        fModule: "",
+        fContractPrice: 0,
+        fStandardPrice: 0,
+        fDcRate: 0,
+        fModule: 0,
       },
       list: [],
       customs: [],
@@ -424,6 +473,14 @@ export default {
     maxHeight() {
       return document.body.offsetHeight - 350;
     },
+    canEdit() {
+      const { state } = this.$route.query;
+      return state == "edit" || state == "create" || state == void 0;
+    },
+    billId() {
+      const { id } = this.$route.query;
+      return id;
+    },
   },
   methods: {
     loadSoftWareList() {
@@ -431,6 +488,31 @@ export default {
         if (state == `success`) {
           this.softwares = data;
         }
+      });
+    },
+    loadRecordInfo(id) {
+      loadRecord({ id: id }).then((res) => {
+        res.data.data.fisCommissionV = res.data.data.fisCommissiom ? "1" : "0";
+        this.formModel.fields = res.data.data;
+      });
+      loadRecordEntry({ id: id }).then((res) => {
+        // if (res.data.data.length > 0) {
+        //   var struct = res.data.data[0];
+        //   var newStruct = {};
+
+        //   for (var key in struct) {
+        //     let newKey = key.charAt(0).toUpperCase() + key.slice(1);
+        //     newStruct[key] = newKey;
+        //   }
+        // }
+        this.list = res.data.data;
+        // this.list = res.data.data.map((item) => {
+        //   let newitem = Object.assign({}, newStruct);
+        //   for (var key in item) {
+        //     newitem[newStruct[key]] = item[key];
+        //   }
+        //   return newitem;
+        // });
       });
     },
     initBillNo() {
@@ -505,7 +587,7 @@ export default {
           { form: this.formModel.fields },
           {
             fomr: {
-              fisCommision: this.formModel.fields.fisCommisionV == "1" ? 1 : 0,
+              fisCommision: this.formModel.fields.fisCommissionV == "1" ? 1 : 0,
             },
           },
           { Entry: this.list }
@@ -519,14 +601,18 @@ export default {
       });
     },
     beforeSave() {
-      if (this.list.length <= 0 || this.list.some((f) => f.FSoftwareId == -1)) {
+      if (this.list.length <= 0 || this.list.some((f) => f.fSoftwareId == -1)) {
         return this.$Message.error("表体信息不完整!");
       }
     },
   },
   mounted() {
     this.loadSoftWareList();
-    this.initBillNo();
+    if (this.$route.query.id && this.$route.query.id > -1) {
+      this.loadRecordInfo(this.$route.query.id);
+    } else {
+      this.initBillNo();
+    }
     this.initCustom();
     this.initSalesman();
     this.initUserBind(this.$store.state.user.userGuid);

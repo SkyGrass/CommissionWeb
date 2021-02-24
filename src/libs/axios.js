@@ -4,6 +4,7 @@ import { getToken } from "@/libs/util";
 import router from "@/router";
 import { Message, Modal } from "iview";
 import iView from "iview";
+import Vue from 'vue'
 // let token = getToken()
 // axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
 // import { Spin } from 'iview'
@@ -80,12 +81,11 @@ class HttpRequest {
     // 请求拦截
     instance.interceptors.request.use(
       config => {
-        // 添加全局的loading...
         if (!Object.keys(this.queue).length) {
-          // Spin.show() // 不建议开启，因为界面不友好
           iView.LoadingBar.start();
         }
         this.queue[url] = true;
+
         return config;
       },
       error => {

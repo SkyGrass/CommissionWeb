@@ -2,7 +2,7 @@ export default {
   /**
    * @description 配置显示在浏览器标签的title
    */
-  title: "天天欣业收据管理平台",
+  title: "收入提成管理平台",
   /**
    * @description token在Cookie中存储的天数，默认1天
    */
@@ -19,13 +19,13 @@ export default {
   baseUrl: {
     dev: "http://localhost:54321/",
     //pro: "http://106.14.186.60:7083",
-    pro: "http://106.14.186.60:8086",
+    pro: "",
     defaultPrefix: "api/v1/"
   },
   authUrl: {
     dev: "http://localhost:54321/api/oauth/auth",
     //pro: "http://106.14.186.60:7083/api/oauth/auth"
-    pro: "http://106.14.186.60:8086/api/oauth/auth"
+    pro: "/api/oauth/auth"
   },
   /**
    * @description 默认打开的首页的路由name值，默认为home

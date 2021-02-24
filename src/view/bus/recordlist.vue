@@ -113,6 +113,7 @@
                         style="width: 165px"
                         placeholder="请选择日期"
                         size="small"
+                        @on-change="handleSearchRecord"
                         v-model="stores.record.query.beginDate"
                       ></DatePicker>
                       <DatePicker
@@ -121,6 +122,7 @@
                         style="width: 165px"
                         placeholder="请选择日期"
                         size="small"
+                        @on-change="handleSearchRecord"
                         v-model="stores.record.query.endDate"
                       ></DatePicker>
                     </Input>
@@ -192,6 +194,12 @@
               renderStatus(row.fStatus).text
             }}</Tag>
           </template>
+          <template slot-scope="{ row, index }" slot="fIsCommission">
+            <Tag :color="renderStatus(row.fIsCommission).color">{{
+              renderCommissionStatus(row.fIsCommission).text
+            }}</Tag>
+          </template>
+
           <template slot-scope="{ row, index }" slot="fIsDeleted">
             <Tag :color="renderBillStatus(row.fIsDeleted).color">{{
               renderBillStatus(row.fIsDeleted).text
@@ -202,7 +210,7 @@
               confirm
               :transfer="true"
               title="确定要删除吗?"
-              v-show="!row.fIsDeleted"
+              v-show="!row.fIsDeleted && row.fStatus == 0"
               @on-ok="handleDelete(row)"
             >
               <Tooltip
@@ -223,7 +231,7 @@
               placement="top"
               content="编辑"
               :delay="1000"
-              v-show="!row.fIsDeleted"
+              v-show="!row.fIsDeleted && row.fStatus == 0"
               :transfer="true"
             >
               <Button
@@ -235,11 +243,32 @@
                 @click="handleEdit(row)"
               ></Button>
             </Tooltip>
+            <Poptip
+              confirm
+              :transfer="true"
+              title="确定要审批吗?"
+              v-show="row.fStatus == 0"
+              @on-ok="handleAudit(row)"
+            >
+              <Tooltip
+                placement="top"
+                content="审批"
+                :delay="1000"
+                :transfer="true"
+              >
+                <Button
+                  type="error"
+                  size="small"
+                  shape="circle"
+                  icon="md-bookmarks"
+                ></Button>
+              </Tooltip>
+            </Poptip>
             <Tooltip
               placement="top"
               content="查看"
+              v-show="row.fStatus == 1"
               :delay="1000"
-              v-show="row.fIsDeleted"
               :transfer="true"
             >
               <Button
@@ -260,7 +289,7 @@
 
 <script>
 import DzTable from "_c/tables/dz-table.vue";
-import { getRecordList, deleteRecord } from "@/api/bus/record";
+import { getRecordList, deleteRecord, auditRecord } from "@/api/bus/record";
 import dayjs from "dayjs";
 import { getAllCustom } from "@/api/base/custom";
 import { getAllSalesman } from "@/api/base/saleman";
@@ -471,6 +500,13 @@ export default {
             },
             { title: "备注", key: "fRemark", width: 150 },
             {
+              title: "是否计提",
+              key: "fIsCommission",
+              align: "center",
+              width: 120,
+              slot: "fIsCommission",
+            },
+            {
               title: "审批状态",
               key: "fStatus",
               align: "center",
@@ -548,7 +584,22 @@ export default {
         this.stores.record.query.totalCount = res.data.totalCount;
       });
     },
-
+    handleAudit(row) {
+      let id = row.fId;
+      if (!id) {
+        this.$Message.warning("请选择至少一条数据");
+        return;
+      }
+      auditRecord(id).then((res) => {
+        if (res.data.code === 200) {
+          this.$Message.success(res.data.message);
+          this.loadRecordList();
+          this.formModel.selection = [];
+        } else {
+          this.$Message.warning(res.data.message);
+        }
+      });
+    },
     handleEdit(row) {
       const route = {
         name: "record_page",
@@ -631,6 +682,17 @@ export default {
         case 0:
           _status.text = "未审批";
           _status.color = "error";
+          break;
+      }
+      return _status;
+    },
+    renderCommissionStatus(status) {
+      let _status = {
+        text: "计提",
+      };
+      switch (status) {
+        case 0:
+          _status.text = "不计提";
           break;
       }
       return _status;

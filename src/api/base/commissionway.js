@@ -17,7 +17,7 @@ export const getCommisionSelectList = data => {
 };
 
 // createCommission
-export const createCommission = data => {
+export const createCommissionWay = data => {
   return axios.request({
     url: "base/commisionway/create",
     method: "post",
@@ -26,7 +26,7 @@ export const createCommission = data => {
 };
 
 //loadCommission
-export const loadCommission = data => {
+export const loadCommissionWay = data => {
   return axios.request({
     url: "base/commisionway/edit/" + data.id,
     method: "get"
@@ -34,7 +34,7 @@ export const loadCommission = data => {
 };
 
 // editCommission
-export const editCommission = data => {
+export const editCommissionWay = data => {
   return axios.request({
     url: "base/commisionway/edit",
     method: "post",
@@ -43,7 +43,7 @@ export const editCommission = data => {
 };
 
 // delete commisionway
-export const deleteCommission = ids => {
+export const deleteCommissionWay = ids => {
   return axios.request({
     url: "base/commisionway/delete/" + ids,
     method: "get"

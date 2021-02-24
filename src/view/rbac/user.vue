@@ -572,7 +572,7 @@ export default {
       getSalesManSelectList({}).then(({ data: { state, data } }) => {
         if (state == `success`) {
           this.salesmans = data.map((f) => {
-            f.disabled = f.canUse > -1;
+            f.disabled = f.canUse > 0;
             return f;
           });
         }

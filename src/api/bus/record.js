@@ -23,6 +23,14 @@ export const deleteRecord = ids => {
   });
 };
 
+export const auditRecord = id => {
+  return axios.request({
+    url: "bus/bill/audit/" + id,
+    method: "get"
+  });
+};
+
+
 export const getRecordList = data => {
   return axios.request({
     url: "bus/bill/list",
@@ -31,3 +39,16 @@ export const getRecordList = data => {
   });
 };
 
+export const loadRecord = data => {
+  return axios.request({
+    url: "bus/bill/edit/" + data.id,
+    method: "get"
+  });
+};
+
+export const loadRecordEntry = data => {
+  return axios.request({
+    url: "bus/bill/editentry/" + data.id,
+    method: "get"
+  });
+};

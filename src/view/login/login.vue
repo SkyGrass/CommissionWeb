@@ -9,7 +9,7 @@
       <div class="login">
         <div class="login-con">
           <Card icon="log-in" :bordered="false">
-            <p slot="title" class="title">天天欣业收据管理平台</p>
+            <p slot="title" class="title">收入提成管理平台</p>
             <div class="form-con">
               <login-form
                 @on-success-valid="handleSubmit"

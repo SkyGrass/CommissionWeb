@@ -20,6 +20,8 @@ import ZkTable from "vue-table-with-tree-grid";
 
 Vue.use(ZkTable);
 
+import { BASE_URL } from './static/config.js';
+
 // 实际打包时应该不引入mock
 /* eslint-disable */
 // if (process.env.NODE_ENV !== 'production') require('@/mock')
@@ -54,14 +56,5 @@ new Vue({
   router,
   i18n,
   store,
-  created() {},
-  mounted() {
-    var target = this;
-    //initRouter(target);
-    // 调用方法，动态生成路由
-    setTimeout(function() {
-      //initRouter(target);
-    }, 1500);
-  },
   render: h => h(App)
 });

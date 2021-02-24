@@ -210,7 +210,7 @@
             </FormItem>
           </Col>
         </Row>
-        <FormItem label="备注" label-position="top"  prop="description">
+        <FormItem label="备注" label-position="top" prop="description">
           <Input
             type="textarea"
             v-model="formModel.fields.description"
@@ -241,10 +241,10 @@
 import DzTable from "_c/tables/dz-table.vue";
 import {
   getCommissionWayList,
-  createCommissionway,
-  loadCommissionway,
-  editCommissionway,
-  deleteCommissionway,
+  createCommissionWay,
+  loadCommissionWay,
+  editCommissionWay,
+  deleteCommissionWay,
   batchCommand,
 } from "@/api/base/commissionway";
 export default {
@@ -442,7 +442,7 @@ export default {
       this.$refs["formCommissionway"].resetFields();
     },
     doCreateCommissionway() {
-      createCommissionway(this.formModel.fields).then((res) => {
+      createCommissionWay(this.formModel.fields).then((res) => {
         if (res.data.code === 200) {
           this.$Message.success(res.data.message);
           this.handleCloseFormWindow();
@@ -453,7 +453,7 @@ export default {
       });
     },
     doEditCommissionway() {
-      editCommissionway(this.formModel.fields).then((res) => {
+      editCommissionWay(this.formModel.fields).then((res) => {
         if (res.data.code === 200) {
           this.$Message.success(res.data.message);
           this.handleCloseFormWindow();
@@ -475,8 +475,7 @@ export default {
       return _valid;
     },
     doLoadCommissionway(id) {
-      console.log(id);
-      loadCommissionway({ id: id }).then((res) => {
+      loadCommissionWay({ id: id }).then((res) => {
         this.formModel.fields = res.data.data;
       });
     },
@@ -488,7 +487,7 @@ export default {
         this.$Message.warning("请选择至少一条数据");
         return;
       }
-      deleteCommissionway(ids).then((res) => {
+      deleteCommissionWay(ids).then((res) => {
         if (res.data.code === 200) {
           this.$Message.success(res.data.message);
           this.loadCommissionwayList();
