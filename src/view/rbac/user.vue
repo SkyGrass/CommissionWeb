@@ -359,7 +359,12 @@
         </Row>
       </Form>
       <div class="demo-drawer-footer">
+        <Button icon="md-trash" type="warning" @click="handleUnBindUser"
+          >解除绑定</Button
+        >
+
         <Button
+          style="margin-left: 8px"
           icon="md-checkmark-circle"
           type="primary"
           @click="handleBindUser"
@@ -644,6 +649,9 @@ export default {
         }
       }
     },
+    handleUnBindUser() {
+      this.doBindUser("unbind");
+    },
     handleResetFormUser() {
       this.$refs["formUser"].resetFields();
     },
@@ -672,8 +680,14 @@ export default {
         }
       });
     },
-    doBindUser() {
-      bindUser(this.formModel.bindfields).then((res) => {
+    doBindUser(model) {
+      bindUser(
+        Object.assign(
+          {},
+          this.formModel.bindfields,
+          model == "unbind" ? { salesmanId: -1 } : {}
+        )
+      ).then((res) => {
         if (res.data.code === 200) {
           this.$Message.success(res.data.message);
           this.formModel.binded = false;

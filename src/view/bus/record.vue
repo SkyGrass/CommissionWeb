@@ -5,31 +5,31 @@
       inline
       ref="formRecord"
       @submit.native.prevent
+      :rules="formModel.rules"
       :label-width="90"
     >
       <Row :gutter="16">
-        <Col span="3">
+        <Col span="4">
           <FormItem label="单号" prop="fBillNo">
             <Input
-              style="width: 165px"
               v-model="formModel.fields.fBillNo"
               readonly
             ></Input> </FormItem
         ></Col>
-        <Col span="3">
-          <FormItem label="日期" prop="fDate" style="width: 165px">
+        <Col span="4">
+          <FormItem label="日期" prop="fDate">
             <DatePicker
               type="date"
-              style="width: 165px"
               placeholder="请选择日期"
               v-model="formModel.fields.fDate"
               :readonly="!canEdit"
+              format="yyyy-MM-dd"
             ></DatePicker> </FormItem
         ></Col>
-        <Col span="3">
+        <Col span="4">
           <FormItem label="客户" prop="fCustomId"
             ><Select
-              style="width: 162px"
+              style="width: 145px"
               clearable
               v-model="formModel.fields.fCustomId"
               :disabled="!canEdit"
@@ -46,10 +46,10 @@
         >
       </Row>
       <Row :gutter="16">
-        <Col span="3">
+        <Col span="4">
           <FormItem label="业务员" prop="fSalesmanId"
             ><Select
-              style="width: 162px"
+              style="width: 160px"
               clearable
               v-model="formModel.fields.fSalesmanId"
               placeholder="请选择业务员"
@@ -64,10 +64,10 @@
             </Select>
           </FormItem></Col
         >
-        <Col span="3">
+        <Col span="4">
           <FormItem label="经办人" prop="fConfirmerId"
             ><Select
-              style="width: 162px"
+              style="width: 185px"
               clearable
               v-model="formModel.fields.fConfirmerId"
               placeholder="请选择经办人"
@@ -82,10 +82,10 @@
             </Select>
           </FormItem></Col
         >
-        <Col span="3">
+        <Col span="4">
           <FormItem label="计提" prop="fisCommissionV">
             <Select
-              style="width: 162px"
+              style="width: 145px"
               v-model="formModel.fields.fisCommissionV"
               placeholder="请选择是否计提"
               :disabled="!canEdit"
@@ -142,6 +142,7 @@ import { getAllSalesman } from "@/api/base/saleman";
 import { getBindUser } from "@/api/rbac/user";
 import { createRecord } from "@/api/bus/record";
 import dayjs from "dayjs";
+import NP from "number-precision";
 export default {
   name: `record_page`,
   data() {
@@ -152,57 +153,56 @@ export default {
         fields: {
           fId: -1,
           fBillNo: "",
-          fDate: dayjs(new Date()).format("YYYY-MM-DD"),
+          fDate: new Date(),
           fCustomId: -1,
-          fsalesmanId: -1,
+          fSalesmanId: -1,
           fisCommissionV: "1",
-          fremark: "",
+          fRemark: "",
           fisAudit: 0,
         },
-        rules: [
-          {
-            fBillNo: [
-              {
-                type: "string",
-                required: true,
-                message: "请输入单号",
-                min: 3,
-              },
-            ],
-            fDate: [
-              {
-                type: "string",
-                required: true,
-                message: "请选择日期",
-                min: 3,
-              },
-            ],
-            fCustomId: [
-              {
-                required: true,
-                message: "请选择客户",
-                trigger: "change",
-                type: "number",
-              },
-            ],
-            fSalesmanId: [
-              {
-                required: true,
-                message: "请选择业务员",
-                trigger: "change",
-                type: "number",
-              },
-            ],
-            fConfirmerId: [
-              {
-                required: true,
-                message: "请选择经办人",
-                trigger: "change",
-                type: "number",
-              },
-            ],
-          },
-        ],
+        rules: {
+          fBillNo: [
+            {
+              type: "string",
+              required: true,
+              message: "请输入单号",
+              min: 3,
+            },
+          ],
+          fDate: [
+            {
+              type: "date",
+              required: true,
+              message: "请选择日期",
+              trigger: "change",
+              pattern: /.+/,
+            },
+          ],
+          fCustomId: [
+            {
+              required: true,
+              message: "请选择客户",
+              trigger: "change",
+              type: "number",
+            },
+          ],
+          fSalesmanId: [
+            {
+              required: true,
+              message: "请选择业务员",
+              trigger: "change",
+              type: "number",
+            },
+          ],
+          fConfirmerId: [
+            {
+              required: true,
+              message: "请选择经办人",
+              trigger: "change",
+              type: "number",
+            },
+          ],
+        },
       },
       softwares: [],
       columns: [
@@ -219,7 +219,6 @@ export default {
             } = params;
             const val = row[key];
             const software = this.softwares.filter((f) => f.id == val);
-            console.log(software);
             return h(
               "div",
               self.canEdit
@@ -257,7 +256,7 @@ export default {
           },
         },
         {
-          width: 250,
+          width: 450,
           key: "fModule",
           title: "模块明细",
           align: "center",
@@ -278,9 +277,10 @@ export default {
                           step: 1,
                           value: this.list[index][key],
                           disabled: !self.canEdit,
+                          type: "textarea",
                         },
                         style: {
-                          width: "80%",
+                          width: "100%",
                         },
                         on: {
                           input: (val) => {
@@ -324,6 +324,15 @@ export default {
                         },
                         on: {
                           "on-change": (e) => {
+                            const standardPrice = this.list[index][
+                              "fStandardPrice"
+                            ];
+                            const result = NP.divide(e, standardPrice);
+
+                            this.list[index]["fDcRate"] = (result == Infinity
+                              ? 0
+                              : result
+                            ).toFixed(2);
                             this.list[index][key] = e;
                           },
                         },
@@ -364,6 +373,13 @@ export default {
                         },
                         on: {
                           "on-change": (e) => {
+                            const contractPrice = this.list[index][
+                              "fContractPrice"
+                            ];
+                            this.list[index]["fDcRate"] = NP.divide(
+                              contractPrice,
+                              e
+                            );
                             this.list[index][key] = e;
                           },
                         },
@@ -397,7 +413,7 @@ export default {
                           step: 0.01,
                           min: 0,
                           value: this.list[index][key],
-                          disabled: !self.canEdit,
+                          disabled: true,
                         },
                         style: {
                           width: "80%",
@@ -460,26 +476,19 @@ export default {
         fContractPrice: 0,
         fStandardPrice: 0,
         fDcRate: 0,
-        fModule: 0,
+        fPoints: 0,
       },
       list: [],
       customs: [],
       salesmans: [],
       curSelectRowIndex: -1,
       curSelectRow: {},
+      canEdit: false,
     };
   },
   computed: {
     maxHeight() {
       return document.body.offsetHeight - 350;
-    },
-    canEdit() {
-      const { state } = this.$route.query;
-      return state == "edit" || state == "create" || state == void 0;
-    },
-    billId() {
-      const { id } = this.$route.query;
-      return id;
     },
   },
   methods: {
@@ -496,23 +505,7 @@ export default {
         this.formModel.fields = res.data.data;
       });
       loadRecordEntry({ id: id }).then((res) => {
-        // if (res.data.data.length > 0) {
-        //   var struct = res.data.data[0];
-        //   var newStruct = {};
-
-        //   for (var key in struct) {
-        //     let newKey = key.charAt(0).toUpperCase() + key.slice(1);
-        //     newStruct[key] = newKey;
-        //   }
-        // }
         this.list = res.data.data;
-        // this.list = res.data.data.map((item) => {
-        //   let newitem = Object.assign({}, newStruct);
-        //   for (var key in item) {
-        //     newitem[newStruct[key]] = item[key];
-        //   }
-        //   return newitem;
-        // });
       });
     },
     initBillNo() {
@@ -572,41 +565,96 @@ export default {
     handleSubmit() {
       let valid = this.validateUserForm();
       if (valid) {
-        if (this.formModel.mode === "create") {
-          this.doCreateRecord();
-        }
-        if (this.formModel.mode === "edit") {
-          this.doEditSaleMan();
-        }
+        this.$Modal.confirm({
+          title: "操作提示",
+          content: "<p>确定要保存当前单据吗?</p>",
+          loading: true,
+          onOk: () => {
+            if (this.beforeSave()) {
+              if (this.formModel.mode === "create") {
+                this.doCreateRecord();
+              }
+              if (this.formModel.mode === "edit") {
+                this.doEditRecord();
+              }
+            }
+          },
+        });
       }
     },
     doCreateRecord() {
       createRecord(
         Object.assign(
           {},
-          { form: this.formModel.fields },
           {
-            fomr: {
-              fisCommision: this.formModel.fields.fisCommissionV == "1" ? 1 : 0,
-            },
+            form: Object.assign({}, this.formModel.fields, {
+              fisCommission:
+                this.formModel.fields.fisCommissionV == "1" ? 1 : 0,
+              fDate: dayjs(this.formModel.fields.fDate).format("YYYY-MM-DD"),
+            }),
           },
           { Entry: this.list }
         )
       ).then((res) => {
         if (res.data.code === 200) {
           this.$Message.success(res.data.message);
+          this.loadRecordInfo(res.data.data.split("|").pop());
+          this.canEdit = false;
         } else {
           this.$Message.warning(res.data.message);
         }
+
+        this.$Modal.remove();
+      });
+    },
+    doEditRecord() {
+      createRecord(
+        Object.assign(
+          {},
+          {
+            form: Object.assign({}, this.formModel.fields, {
+              fisCommission:
+                this.formModel.fields.fisCommissionV == "1" ? 1 : 0,
+              fDate: dayjs(this.formModel.fields.fDate).format("YYYY-MM-DD"),
+            }),
+          },
+          { Entry: this.list }
+        )
+      ).then((res) => {
+        if (res.data.code === 200) {
+          this.$Message.success(res.data.message);
+          this.loadRecordInfo(res.data.data.split("|").pop());
+          this.canEdit = false;
+        } else {
+          this.$Message.warning(res.data.message);
+        }
+
+        this.$Modal.remove();
       });
     },
     beforeSave() {
       if (this.list.length <= 0 || this.list.some((f) => f.fSoftwareId == -1)) {
-        return this.$Message.error("表体信息不完整!");
+        this.$Message.error("表体信息不完整!");
+        return false;
       }
+      let tmp = [...this.list].map((f) => {
+        return f.fSoftwareId;
+      });
+      let len = tmp.length;
+      tmp = new Set(tmp);
+      if (len != tmp.size) {
+        this.$Message.error("表体出现重复行!!");
+        this.$Modal.remove();
+        return false;
+      }
+
+      return true;
     },
   },
   mounted() {
+    const { state } = this.$route.query;
+    this.canEdit = state == "edit" || state == "create" || state == void 0;
+
     this.loadSoftWareList();
     if (this.$route.query.id && this.$route.query.id > -1) {
       this.loadRecordInfo(this.$route.query.id);

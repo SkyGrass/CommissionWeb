@@ -397,11 +397,9 @@ export default {
             {
               title: "产品编码",
               key: "softwareId",
-              width: 150,
+              width: 80,
               render: (h, { row: { softwareId } }) => {
-                const row = self.softwares.filter(
-                  (f) => f.id == softwareId
-                )[0];
+                const row = self.softwares.filter((f) => f.id == softwareId)[0];
                 return h("div", row.code);
               },
             },
@@ -410,16 +408,14 @@ export default {
               key: "softwareId",
               width: 150,
               render: (h, { row: { softwareId } }) => {
-                const row = self.softwares.filter(
-                  (f) => f.id == softwareId
-                )[0];
+                const row = self.softwares.filter((f) => f.id == softwareId)[0];
                 return h("div", row.text);
               },
             },
             {
               title: "提成方式",
               key: "commissionWayId",
-              width: 150,
+              width: 100,
               render: (h, { row: { commisionWayId } }) => {
                 const row = self.commisionway.filter(
                   (f) => f.id == commisionWayId
@@ -427,12 +423,20 @@ export default {
                 return h("div", row.text);
               },
             },
-            { title: "成交折扣(最低)", key: "startPeriod", width: 150 },
-            { title: "成交折扣(最多)", key: "endPeriod", width: 150 },
+            {
+              title: "折扣(最低)",
+              key: "startPeriod",
+              width: 100,
+            },
+            {
+              title: "折扣(最多)",
+              key: "endPeriod",
+              width: 100,
+            },
             {
               title: "提成比率(%)",
               key: "proportion",
-              width: 150,
+              width: 100,
             },
             {
               title: "状态",

@@ -44,8 +44,8 @@
                   icon="md-create"
                   type="primary"
                   @click="handleShowCreateWindow"
-                  title="新增软件产品"
-                  >新增软件产品</Button
+                  title="新增绑定"
+                  >新增绑定</Button
                 >
               </Col>
             </Row>

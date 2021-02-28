@@ -20,7 +20,6 @@ import ZkTable from "vue-table-with-tree-grid";
 
 Vue.use(ZkTable);
 
-import { BASE_URL } from './static/config.js';
 
 // 实际打包时应该不引入mock
 /* eslint-disable */

@@ -35,11 +35,11 @@
                           >{{ item.text }}</Option
                         >
                       </Select> -->
-                      <Select
+                      <!-- <Select
                         slot="prepend"
                         v-model="stores.record.query.status"
                         @on-change="handleSearchRecord"
-                        placeholder="客户状态"
+                        placeholder="单据状态"
                         style="width: 80px"
                       >
                         <Option
@@ -48,8 +48,8 @@
                           :key="item.value"
                           >{{ item.text }}</Option
                         >
-                      </Select>
-                      <Select
+                      </Select> -->
+                      <!-- <Select
                         slot="prepend"
                         v-model="stores.record.query.isCommission"
                         @on-change="handleSearchRecord"
@@ -63,9 +63,8 @@
                           :key="item.value"
                           >{{ item.text }}</Option
                         >
-                      </Select>
-
-                      <Select
+                      </Select> -->
+                      <!-- <Select
                         slot="prepend"
                         v-model="stores.record.query.customId"
                         placeholder="选择客户"
@@ -78,25 +77,11 @@
                           :key="index"
                           >{{ option.text }}</Option
                         >
-                      </Select>
+                      </Select> -->
                       <Select
                         slot="prepend"
                         v-model="stores.record.query.salesmanId"
                         placeholder="选择业务员"
-                        @on-change="handleSearchRecord"
-                        style="width: 150px"
-                      >
-                        <Option
-                          v-for="(option, index) in salesmans"
-                          :value="option.id"
-                          :key="index"
-                          >{{ option.text }}</Option
-                        >
-                      </Select>
-                      <Select
-                        slot="prepend"
-                        placeholder="选择经办人"
-                        v-model="stores.record.query.confirmerId"
                         @on-change="handleSearchRecord"
                         style="width: 150px"
                       >
@@ -161,6 +146,7 @@
                     @click="handleRefresh"
                   ></Button>
                 </ButtonGroup>
+
                 <Button
                   v-can="'create'"
                   icon="md-download"
@@ -175,8 +161,8 @@
                   icon="md-create"
                   type="primary"
                   @click="handleShowCreateWindow"
-                  title="新增销售记录"
-                  >新增销售记录</Button
+                  title="新增计算单"
+                  >新增计算单</Button
                 >
               </Col>
             </Row>
@@ -203,11 +189,11 @@
               renderStatus(row.fStatus).text
             }}</Tag>
           </template>
-          <template slot-scope="{ row, index }" slot="fIsCommission">
+          <!-- <template slot-scope="{ row, index }" slot="fIsCommission">
             <Tag :color="renderStatus(row.fIsCommission).color">{{
               renderCommissionStatus(row.fIsCommission).text
             }}</Tag>
-          </template>
+          </template> -->
 
           <template slot-scope="{ row, index }" slot="fIsDeleted">
             <Tag :color="renderBillStatus(row.fIsDeleted).color">{{
@@ -252,7 +238,7 @@
                 @click="handleEdit(row)"
               ></Button>
             </Tooltip>
-            <Poptip
+            <!-- <Poptip
               confirm
               :transfer="true"
               title="确定要审批吗?"
@@ -272,7 +258,7 @@
                   icon="md-bookmarks"
                 ></Button>
               </Tooltip>
-            </Poptip>
+            </Poptip> -->
             <Tooltip
               placement="top"
               content="查看"
@@ -298,18 +284,17 @@
 <script>
 import DzTable from "_c/tables/dz-table.vue";
 import {
-  getRecordList,
-  deleteRecord,
-  auditRecord,
+  getCalcRecordList,
+  deleteCalcRecord,
+  auditCalcRecord,
   exportData,
-} from "@/api/bus/record";
+} from "@/api/bus/calcRecord";
 import dayjs from "dayjs";
-import { getAllCustom } from "@/api/base/custom";
 import { getAllSalesman } from "@/api/base/saleman";
 import { b64toFile } from "@/libs/tools";
 import { saveAs } from "file-saver";
 export default {
-  name: "record_list_page",
+  name: "calc_record_list_page",
   components: {
     DzTable,
   },
@@ -326,57 +311,6 @@ export default {
         title: "创建客户",
         mode: "create",
         selection: [],
-        fields: {
-          id: -1,
-          code: "",
-          name: "",
-          linkName: "",
-          linkPhone: "",
-          cardNo: "",
-          description: "",
-          status: 1,
-          isDeleted: 0,
-          createdOn: null,
-          createdByUserGuid: "",
-          createdByUserName: "",
-          modifiedOn: null,
-          modifiedByUserGuid: "",
-          modifiedByUserName: "",
-        },
-        rules: {
-          code: [
-            {
-              type: "string",
-              required: true,
-              message: "请输入客户编码",
-              min: 1,
-            },
-          ],
-          name: [
-            {
-              type: "string",
-              required: true,
-              message: "请输入客户名称",
-              min: 1,
-            },
-          ],
-          linkName: [
-            {
-              type: "string",
-              required: true,
-              message: "请输入客户联系人",
-              min: 1,
-            },
-          ],
-          linkPhone: [
-            {
-              type: "string",
-              required: true,
-              message: "请输入客户联系人电话",
-              min: 11,
-            },
-          ],
-        },
       },
       stores: {
         record: {
@@ -386,11 +320,8 @@ export default {
             currentPage: 1,
             kw: "",
             isDeleted: 0,
-            isCommission: -1,
             status: -1,
             salesmanId: -1,
-            customId: -1,
-            confirmerId: -1,
             beginDate: dayjs(new Date()).add(-7, "day").format("YYYY-MM-DD"),
             endDate: dayjs(new Date()).format("YYYY-MM-DD"),
             sort: [
@@ -444,16 +375,6 @@ export default {
               },
             },
             {
-              title: "客户",
-              key: "fCustomId",
-              align: "center",
-              width: 100,
-              render: (h, { row: { fCustomId } }) => {
-                const row = this.customs.filter((f) => f.id == fCustomId)[0];
-                return h("div", row && row.name);
-              },
-            },
-            {
               title: "业务员",
               key: "fSalesmanId",
               align: "center",
@@ -461,18 +382,6 @@ export default {
               render: (h, { row: { fSalesmanId } }) => {
                 const row = this.salesmans.filter(
                   (f) => f.id == fSalesmanId
-                )[0];
-                return h("div", row && row.name);
-              },
-            },
-            {
-              title: "经办人",
-              key: "fConfirmerId",
-              align: "center",
-              width: 120,
-              render: (h, { row: { fConfirmerId } }) => {
-                const row = this.salesmans.filter(
-                  (f) => f.id == fConfirmerId
                 )[0];
                 return h("div", row && row.name);
               },
@@ -508,26 +417,44 @@ export default {
               width: 100,
             },
             {
+              title: "提成金额",
+              key: "fCommissionPrice",
+              align: "right",
+              width: 120,
+            },
+            {
+              title: "加减项目",
+              key: "fExpand",
+              align: "right",
+              width: 120,
+            },
+            {
+              title: "提成合计",
+              key: "fTotal",
+              align: "right",
+              width: 120,
+            },
+            {
               title: "本单积分",
               key: "fPoints",
               align: "center",
               width: 120,
             },
             { title: "备注", key: "fRemark", width: 150 },
-            {
-              title: "是否计提",
-              key: "fIsCommission",
-              align: "center",
-              width: 120,
-              slot: "fIsCommission",
-            },
-            {
-              title: "审批状态",
-              key: "fStatus",
-              align: "center",
-              width: 120,
-              slot: "fStatus",
-            },
+            // {
+            //   title: "是否计提",
+            //   key: "fIsCommission",
+            //   align: "center",
+            //   width: 120,
+            //   slot: "fIsCommission",
+            // },
+            // {
+            //   title: "审批状态",
+            //   key: "fStatus",
+            //   align: "center",
+            //   width: 120,
+            //   slot: "fStatus",
+            // },
             {
               title: "单据状态",
               key: "fIsDeleted",
@@ -556,8 +483,6 @@ export default {
       typesIcons: ["ios-eye-outline", "ios-eye-off-outline"],
       types: ["password", "text"],
       salesmans: [],
-      salesmans_copy: [],
-      customs: [],
       loadingSearchSalesman: false,
       defaultData: [{ id: -1, name: "全部", value: -1, text: "全部" }],
     };
@@ -571,13 +496,6 @@ export default {
     },
   },
   methods: {
-    initCustom() {
-      getAllCustom({}).then(({ data: { state, data } }) => {
-        if (state == `success`) {
-          this.customs = this.defaultData.concat(data);
-        }
-      });
-    },
     initSalesman() {
       getAllSalesman({}).then(({ data: { state, data } }) => {
         if (state == `success`) {
@@ -587,7 +505,7 @@ export default {
     },
 
     loadRecordList() {
-      getRecordList(
+      getCalcRecordList(
         Object.assign({}, this.stores.record.query, {
           beginDate: dayjs(this.stores.record.query.beginDate).format(
             "YYYY-MM-DD"
@@ -605,7 +523,7 @@ export default {
         this.$Message.warning("请选择至少一条数据");
         return;
       }
-      auditRecord(id).then((res) => {
+      auditCalcRecord(id).then((res) => {
         if (res.data.code === 200) {
           this.$Message.success(res.data.message);
           this.loadRecordList();
@@ -617,26 +535,26 @@ export default {
     },
     handleEdit(row) {
       const route = {
-        name: "record_page",
+        name: "calc_record_page",
         query: {
           id: row.fId,
           state: "edit",
         },
         meta: {
-          title: "销售记录录入-修改",
+          title: "提成计算单录入-修改",
         },
       };
       this.$router.push(route);
     },
     handleRead(row) {
       const route = {
-        name: "record_page",
+        name: "calc_record_page",
         query: {
           id: row.fId,
           state: "read",
         },
         meta: {
-          title: "销售记录录入-查看",
+          title: "提成计算单录入-查看",
         },
       };
       this.$router.push(route);
@@ -656,7 +574,7 @@ export default {
         this.$Message.warning("请选择至少一条数据");
         return;
       }
-      deleteRecord(ids).then((res) => {
+      deleteCalcRecord(ids).then((res) => {
         if (res.data.code === 200) {
           this.$Message.success(res.data.message);
           this.loadRecordList();
@@ -701,17 +619,6 @@ export default {
       }
       return _status;
     },
-    renderCommissionStatus(status) {
-      let _status = {
-        text: "计提",
-      };
-      switch (status) {
-        case 0:
-          _status.text = "不计提";
-          break;
-      }
-      return _status;
-    },
     renderBillStatus(status) {
       let _status = {
         color: "success",
@@ -727,13 +634,13 @@ export default {
     },
     handleShowCreateWindow() {
       const route = {
-        name: "record_page",
+        name: "calc_record_page",
         query: {
           id: -1,
           state: "create",
         },
         meta: {
-          title: "销售记录录入-新增",
+          title: "提成计算单录入-新增",
         },
       };
       this.$router.push(route);
@@ -764,7 +671,6 @@ export default {
   },
   mounted() {
     this.loadRecordList();
-    this.initCustom();
     this.initSalesman();
   },
 };

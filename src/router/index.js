@@ -12,8 +12,6 @@ import Cookies from "js-cookie";
 import { Modal } from "iview";
 // 引入加载菜单
 import { formatMenu } from "@/libs/router-util";
-import { e } from "mathjs";
-
 const { homeName } = config;
 const baseUrl =
   process.env.NODE_ENV === "development"

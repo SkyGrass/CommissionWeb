@@ -2,7 +2,7 @@ import axios from "@/libs/api.request";
 
 export const genBillNo = data => {
   return axios.request({
-    url: "bus/bill/genbillno",
+    url: "bus/calcbill/genbillno",
     method: "post",
     data
   });
@@ -10,62 +10,62 @@ export const genBillNo = data => {
 
 export const createRecord = data => {
   return axios.request({
-    url: "bus/bill/create",
+    url: "bus/calcbill/create",
     method: "post",
     data
   });
 };
 
-export const deleteRecord = ids => {
+export const deleteCalcRecord = ids => {
   return axios.request({
-    url: "bus/bill/delete/" + ids,
+    url: "bus/calcbill/delete/" + ids,
     method: "get"
   });
 };
 
-export const auditRecord = id => {
+export const auditCalcRecord = id => {
   return axios.request({
-    url: "bus/bill/audit/" + id,
+    url: "bus/calcbill/audit/" + id,
     method: "get"
   });
 };
 
 
-export const getRecordList = data => {
+export const getCalcRecordList = data => {
   return axios.request({
-    url: "bus/bill/list",
+    url: "bus/calcbill/list",
     method: "post",
     data
   });
 };
 
-export const getRecordChooseList = data => {
+
+export const getCalcRecordEntry = ids => {
   return axios.request({
-    url: "bus/bill/calclist",
-    method: "post",
-    data
+    url: "bus/bill/calclistentry/" + ids,
+    method: "get"
   });
 };
-
 
 export const loadRecord = data => {
   return axios.request({
-    url: "bus/bill/edit/" + data.id,
+    url: "bus/calcbill/edit/" + data.id,
     method: "get"
   });
 };
 
 export const loadRecordEntry = data => {
   return axios.request({
-    url: "bus/bill/editentry/" + data.id,
+    url: "bus/calcbill/editentry/" + data.id,
     method: "get"
   });
 };
 
 export const exportData = data => {
   return axios.request({
-    url: "bus/bill/exportexcel",
+    url: "bus/calcbill/exportexcel",
     method: "post",
     data
   });
 };
+
