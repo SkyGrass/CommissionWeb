@@ -30,6 +30,12 @@ export const auditRecord = id => {
   });
 };
 
+export const unAuditRecord = id => {
+  return axios.request({
+    url: "bus/bill/unaudit/" + id,
+    method: "get"
+  });
+};
 
 export const getRecordList = data => {
   return axios.request({

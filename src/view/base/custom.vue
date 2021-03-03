@@ -528,7 +528,6 @@ export default {
       return _valid;
     },
     doLoadCustom(id) {
-      console.log(id);
       loadCustom({ id: id }).then((res) => {
         this.formModel.fields = res.data.data;
       });

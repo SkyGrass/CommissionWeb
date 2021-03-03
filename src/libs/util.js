@@ -63,34 +63,6 @@ export const getMenuByRouter = (list, access, pages) => {
  */
 export const getMenuListByRoutes = routes => {
   let res = [];
-  // res = [
-  //   {
-  //     icon: "md-contacts",
-  //     name: "rbac",
-  //     meta: {
-  //       hideInMenu: false,
-  //       title:"用户权限管理"
-  //     },
-  //     children: [
-  //       {
-  //         icon: "md-contacts",
-  //         name: "rbac_user_page",
-  //         meta: {
-  //           hideInMenu: false,
-  //           title:"用户管理"
-  //         }
-  //       },
-  //       {
-  //         icon: "md-contacts",
-  //         name: "rbac_role_page",
-  //         meta: {
-  //           hideInMenu: false,
-  //           title:"权限管理"
-  //         }
-  //       }
-  //     ]
-  //   }];
-  // return res;
   forEach(routes, item => {
     if (!item.meta || (item.meta && !item.meta.hideInMenu)) {
       let obj = {
@@ -320,7 +292,7 @@ export const getArrayFromFile = file => {
     let reader = new FileReader();
     reader.readAsText(file); // 以文本格式读取
     let arr = [];
-    reader.onload = function(evt) {
+    reader.onload = function (evt) {
       let data = evt.target.result; // 读到的数据
       let pasteData = data.trim();
       arr = pasteData
@@ -457,7 +429,7 @@ export const scrollTop = (el, from = 0, to, duration = 500, endCallback) => {
       window.webkitRequestAnimationFrame ||
       window.mozRequestAnimationFrame ||
       window.msRequestAnimationFrame ||
-      function(callback) {
+      function (callback) {
         return window.setTimeout(callback, 1000 / 60);
       };
   }

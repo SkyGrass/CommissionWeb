@@ -17,72 +17,16 @@
                       type="text"
                       search
                       :clearable="true"
+                      class="iptSearch"
+                      enter-button="搜索"
                       v-model="stores.record.query.kw"
                       placeholder="输入关键字搜索..."
-                      @on-search="handleSearchRecord()"
+                      @on-search="handleSearchRecord"
                     >
-                      <!-- <Select
-                        slot="prepend"
-                        v-model="stores.record.query.isDeleted"
-                        @on-change="handleSearchRecord"
-                        placeholder="删除状态"
-                        style="width: 60px"
-                      >
-                        <Option
-                          v-for="item in stores.record.sources.isDeletedSources"
-                          :value="item.value"
-                          :key="item.value"
-                          >{{ item.text }}</Option
-                        >
-                      </Select> -->
-                      <!-- <Select
-                        slot="prepend"
-                        v-model="stores.record.query.status"
-                        @on-change="handleSearchRecord"
-                        placeholder="单据状态"
-                        style="width: 80px"
-                      >
-                        <Option
-                          v-for="item in stores.record.sources.statusSources"
-                          :value="item.value"
-                          :key="item.value"
-                          >{{ item.text }}</Option
-                        >
-                      </Select> -->
-                      <!-- <Select
-                        slot="prepend"
-                        v-model="stores.record.query.isCommission"
-                        @on-change="handleSearchRecord"
-                        placeholder="计提状态"
-                        style="width: 80px"
-                      >
-                        <Option
-                          v-for="item in stores.record.sources
-                            .commissionSources"
-                          :value="item.value"
-                          :key="item.value"
-                          >{{ item.text }}</Option
-                        >
-                      </Select> -->
-                      <!-- <Select
-                        slot="prepend"
-                        v-model="stores.record.query.customId"
-                        placeholder="选择客户"
-                        @on-change="handleSearchRecord"
-                        style="width: 150px"
-                      >
-                        <Option
-                          v-for="(option, index) in customs"
-                          :value="option.id"
-                          :key="index"
-                          >{{ option.text }}</Option
-                        >
-                      </Select> -->
                       <Select
                         slot="prepend"
                         v-model="stores.record.query.salesmanId"
                         placeholder="选择业务员"
-                        @on-change="handleSearchRecord"
                         style="width: 150px"
                       >
                         <Option
@@ -98,7 +42,6 @@
                         style="width: 165px"
                         placeholder="请选择日期"
                         size="small"
-                        @on-change="handleSearchRecord"
                         v-model="stores.record.query.beginDate"
                       ></DatePicker>
                       <DatePicker
@@ -107,7 +50,6 @@
                         style="width: 165px"
                         placeholder="请选择日期"
                         size="small"
-                        @on-change="handleSearchRecord"
                         v-model="stores.record.query.endDate"
                       ></DatePicker>
                     </Input>
@@ -115,40 +57,8 @@
                 </Form>
               </Col>
               <Col span="8" class="dnc-toolbar-btns">
-                <ButtonGroup style="display: none" class="mr3">
-                  <Button
-                    class="txt-danger"
-                    icon="md-trash"
-                    title="删除"
-                    @click="handleBatchCommand('delete')"
-                  ></Button>
-                  <Button
-                    class="txt-success"
-                    icon="md-redo"
-                    title="恢复"
-                    @click="handleBatchCommand('recover')"
-                  ></Button>
-                  <Button
-                    class="txt-danger"
-                    icon="md-hand"
-                    title="禁用"
-                    @click="handleBatchCommand('forbidden')"
-                  ></Button>
-                  <Button
-                    class="txt-success"
-                    icon="md-checkmark"
-                    title="启用"
-                    @click="handleBatchCommand('normal')"
-                  ></Button>
-                  <Button
-                    icon="md-refresh"
-                    title="刷新"
-                    @click="handleRefresh"
-                  ></Button>
-                </ButtonGroup>
-
                 <Button
-                  v-can="'create'"
+                  v-can="'export'"
                   icon="md-download"
                   type="info"
                   @click="handleExport"
@@ -215,6 +125,7 @@
                 :transfer="true"
               >
                 <Button
+                  v-can="'delete'"
                   type="error"
                   size="small"
                   shape="circle"
@@ -238,27 +149,6 @@
                 @click="handleEdit(row)"
               ></Button>
             </Tooltip>
-            <!-- <Poptip
-              confirm
-              :transfer="true"
-              title="确定要审批吗?"
-              v-show="row.fStatus == 0"
-              @on-ok="handleAudit(row)"
-            >
-              <Tooltip
-                placement="top"
-                content="审批"
-                :delay="1000"
-                :transfer="true"
-              >
-                <Button
-                  type="error"
-                  size="small"
-                  shape="circle"
-                  icon="md-bookmarks"
-                ></Button>
-              </Tooltip>
-            </Poptip> -->
             <Tooltip
               placement="top"
               content="查看"
@@ -414,19 +304,19 @@ export default {
               title: "成交折扣",
               key: "fDcRate",
               align: "center",
-              width: 100,
+              width: 80,
             },
             {
               title: "提成金额",
               key: "fCommissionPrice",
               align: "right",
-              width: 120,
+              width: 80,
             },
             {
               title: "加减项目",
               key: "fExpand",
               align: "right",
-              width: 120,
+              width: 80,
             },
             {
               title: "提成合计",
@@ -676,5 +566,10 @@ export default {
 };
 </script>
 
-<style>
+<style lang='less' scope>
+.iptSearch {
+  .ivu-input-default {
+    height: 34px;
+  }
+}
 </style>

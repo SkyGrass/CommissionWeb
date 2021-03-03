@@ -285,7 +285,7 @@ export default {
               type: "string",
               required: true,
               message: "请输入提成比例方式编码",
-              min: 3,
+              min: 1,
             },
           ],
           name: [

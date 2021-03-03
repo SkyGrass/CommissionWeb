@@ -24,8 +24,7 @@ export default {
   },
   authUrl: {
     dev: "http://localhost:54321/api/oauth/auth",
-    //pro: "http://106.14.186.60:7083/api/oauth/auth"
-    pro: "/api/oauth/auth"
+    pro: window.location.pathname + "api/oauth/auth"
   },
   /**
    * @description 默认打开的首页的路由name值，默认为home

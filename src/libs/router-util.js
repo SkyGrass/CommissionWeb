@@ -101,6 +101,7 @@ export const formatMenu = list => {
       obj.children = formatMenu(item.children);
     }
     res.push(obj);
+
   });
   return res;
 };

@@ -15,30 +15,16 @@
                   <FormItem>
                     <Input
                       type="text"
+                      class="iptSearch"
                       search
-                      :clearable="true"
                       v-model="stores.record.query.kw"
+                      enter-button="搜索"
                       placeholder="输入关键字搜索..."
-                      @on-search="handleSearchRecord()"
+                      @on-search="handleSearchRecord"
                     >
-                      <!-- <Select
-                        slot="prepend"
-                        v-model="stores.record.query.isDeleted"
-                        @on-change="handleSearchRecord"
-                        placeholder="删除状态"
-                        style="width: 60px"
-                      >
-                        <Option
-                          v-for="item in stores.record.sources.isDeletedSources"
-                          :value="item.value"
-                          :key="item.value"
-                          >{{ item.text }}</Option
-                        >
-                      </Select> -->
                       <Select
                         slot="prepend"
                         v-model="stores.record.query.status"
-                        @on-change="handleSearchRecord"
                         placeholder="客户状态"
                         style="width: 80px"
                       >
@@ -52,7 +38,6 @@
                       <Select
                         slot="prepend"
                         v-model="stores.record.query.isCommission"
-                        @on-change="handleSearchRecord"
                         placeholder="计提状态"
                         style="width: 80px"
                       >
@@ -68,9 +53,10 @@
                       <Select
                         slot="prepend"
                         v-model="stores.record.query.customId"
-                        placeholder="选择客户"
-                        @on-change="handleSearchRecord"
-                        style="width: 150px"
+                        placeholder="输入关键字选择客户"
+                        filterable
+                        clearable
+                        style="width: 160px"
                       >
                         <Option
                           v-for="(option, index) in customs"
@@ -83,7 +69,6 @@
                         slot="prepend"
                         v-model="stores.record.query.salesmanId"
                         placeholder="选择业务员"
-                        @on-change="handleSearchRecord"
                         style="width: 150px"
                       >
                         <Option
@@ -97,7 +82,6 @@
                         slot="prepend"
                         placeholder="选择经办人"
                         v-model="stores.record.query.confirmerId"
-                        @on-change="handleSearchRecord"
                         style="width: 150px"
                       >
                         <Option
@@ -113,7 +97,6 @@
                         style="width: 165px"
                         placeholder="请选择日期"
                         size="small"
-                        @on-change="handleSearchRecord"
                         v-model="stores.record.query.beginDate"
                       ></DatePicker>
                       <DatePicker
@@ -122,7 +105,6 @@
                         style="width: 165px"
                         placeholder="请选择日期"
                         size="small"
-                        @on-change="handleSearchRecord"
                         v-model="stores.record.query.endDate"
                       ></DatePicker>
                     </Input>
@@ -130,39 +112,8 @@
                 </Form>
               </Col>
               <Col span="8" class="dnc-toolbar-btns">
-                <ButtonGroup style="display: none" class="mr3">
-                  <Button
-                    class="txt-danger"
-                    icon="md-trash"
-                    title="删除"
-                    @click="handleBatchCommand('delete')"
-                  ></Button>
-                  <Button
-                    class="txt-success"
-                    icon="md-redo"
-                    title="恢复"
-                    @click="handleBatchCommand('recover')"
-                  ></Button>
-                  <Button
-                    class="txt-danger"
-                    icon="md-hand"
-                    title="禁用"
-                    @click="handleBatchCommand('forbidden')"
-                  ></Button>
-                  <Button
-                    class="txt-success"
-                    icon="md-checkmark"
-                    title="启用"
-                    @click="handleBatchCommand('normal')"
-                  ></Button>
-                  <Button
-                    icon="md-refresh"
-                    title="刷新"
-                    @click="handleRefresh"
-                  ></Button>
-                </ButtonGroup>
                 <Button
-                  v-can="'create'"
+                  v-can="'export'"
                   icon="md-download"
                   type="info"
                   @click="handleExport"
@@ -229,6 +180,7 @@
                 :transfer="true"
               >
                 <Button
+                  v-can="'delete'"
                   type="error"
                   size="small"
                   shape="circle"
@@ -266,10 +218,33 @@
                 :transfer="true"
               >
                 <Button
+                  v-can="'audit'"
                   type="error"
                   size="small"
                   shape="circle"
-                  icon="md-bookmarks"
+                  icon="md-share-alt"
+                ></Button>
+              </Tooltip>
+            </Poptip>
+            <Poptip
+              confirm
+              :transfer="true"
+              title="确定要反审批吗?"
+              v-show="row.fStatus == 1"
+              @on-ok="handleUnAudit(row)"
+            >
+              <Tooltip
+                placement="top"
+                content="反审批"
+                :delay="1000"
+                :transfer="true"
+              >
+                <Button
+                  v-can="'unaudit'"
+                  type="error"
+                  size="small"
+                  shape="circle"
+                  icon="md-undo"
                 ></Button>
               </Tooltip>
             </Poptip>
@@ -301,6 +276,7 @@ import {
   getRecordList,
   deleteRecord,
   auditRecord,
+  unAuditRecord,
   exportData,
 } from "@/api/bus/record";
 import dayjs from "dayjs";
@@ -615,9 +591,25 @@ export default {
         }
       });
     },
+    handleUnAudit(row) {
+      let id = row.fId;
+      if (!id) {
+        this.$Message.warning("请选择至少一条数据");
+        return;
+      }
+      unAuditRecord(id).then((res) => {
+        if (res.data.code === 200) {
+          this.$Message.success(res.data.message);
+          this.loadRecordList();
+          this.formModel.selection = [];
+        } else {
+          this.$Message.warning(res.data.message);
+        }
+      });
+    },
     handleEdit(row) {
       const route = {
-        name: "record_page",
+        name: "record_edit_page",
         query: {
           id: row.fId,
           state: "edit",
@@ -706,7 +698,7 @@ export default {
         text: "计提",
       };
       switch (status) {
-        case 0:
+        case false:
           _status.text = "不计提";
           break;
       }
@@ -770,5 +762,10 @@ export default {
 };
 </script>
 
-<style>
+<style lang='less' scope>
+.iptSearch {
+  .ivu-input-default {
+    height: 34px;
+  }
+}
 </style>

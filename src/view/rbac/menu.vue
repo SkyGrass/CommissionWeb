@@ -349,7 +349,7 @@ export default {
               type: "string",
               required: true,
               message: "请输入菜单名称",
-              min: 2
+              min: 1
             }
           ],
           alias: [

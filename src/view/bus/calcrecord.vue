@@ -9,19 +9,19 @@
       :label-width="90"
     >
       <Row :gutter="16">
-        <Col span="4">
+        <Col span="5">
           <FormItem label="单号" prop="fBillNo">
             <Input
-              style="width: 145px"
+              style="width: 165px"
               v-model="formModel.fields.fBillNo"
               readonly
             ></Input> </FormItem
         ></Col>
-        <Col span="4">
+        <Col span="5">
           <FormItem label="日期" prop="fDate">
             <DatePicker
               type="date"
-              style="width: 145px"
+              style="width: 165px"
               placeholder="请选择日期"
               v-model="formModel.fields.fDate"
               :readonly="!canEdit"
@@ -29,10 +29,10 @@
             ></DatePicker> </FormItem
         ></Col>
 
-        <Col span="4">
+        <Col span="5">
           <FormItem label="业务员" prop="fSalesmanId"
             ><Select
-              style="width: 162px"
+              style="width: 165px"
               clearable
               v-model="formModel.fields.fSalesmanId"
               placeholder="请选择业务员"
@@ -49,7 +49,7 @@
         >
       </Row>
       <Row :gutter="16">
-        <Col span="10">
+        <Col span="13">
           <FormItem label="备注" prop="fRemark" style="width: 100%">
             <Input
               v-model="formModel.fields.fRemark"
@@ -68,6 +68,8 @@
             @click="handleSubmit"
             v-show="canEdit && list.length > 0"
             >保存</Button
+          ><Button type="warning" @click="resetForm" v-show="!canEdit"
+            >继续新增</Button
           >
         </Col>
       </Row>
@@ -129,6 +131,13 @@
                 >{{ item.text }}</Option
               >
             </Select>
+            <Button
+              style="margin-left: 5px"
+              type="default"
+              @click="initSalesman"
+              :loading="reloading"
+              >重载</Button
+            >
             <Button
               type="info"
               style="margin-left: 10px"
@@ -422,6 +431,7 @@ export default {
       canEdit: false,
       showModal: false,
       modalStyle: { height: "300px" },
+      reloading: false,
     };
   },
   computed: {
@@ -460,9 +470,12 @@ export default {
       });
     },
     initSalesman() {
+      this.reloading = true;
+      this.stores.record.query.salesmanId = -1;
       getAllSalesman({}).then(({ data: { state, data } }) => {
         if (state == `success`) {
           this.salesmans = data;
+          this.reloading = false;
         }
       });
     },
@@ -595,7 +608,10 @@ export default {
       ) {
         return this.$Message.warning("请选择要查询的日期区间");
       }
-      if (this.stores.record.query.salesmanId < 0) {
+      if (
+        this.stores.record.query.salesmanId == void 0 ||
+        this.stores.record.query.salesmanId < 0
+      ) {
         return this.$Message.warning("请选择要查询的业务员");
       }
       getRecordChooseList(
@@ -604,6 +620,7 @@ export default {
             "YYYY-MM-DD"
           ),
           endDate: dayjs(this.stores.record.query.endDate).format("YYYY-MM-DD"),
+          status: 1,
         })
       ).then((res) => {
         if (res.data.totalCount > 0) {
@@ -692,6 +709,16 @@ export default {
           break;
       }
       return _status;
+    },
+    resetForm() {
+      this.canEdit = true;
+      this.initBillNo();
+      this.initSalesman();
+      this.list = [];
+      this.formModel.fields.fId = -1;
+      this.formModel.fields.fSalesmanId = -1;
+      this.formModel.fields.fRemark = "";
+      this.initUserBind(this.$store.state.user.userGuid);
     },
   },
   mounted() {

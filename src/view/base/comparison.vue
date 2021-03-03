@@ -590,7 +590,6 @@ export default {
       return _valid;
     },
     doLoadComparison(id) {
-      console.log(id);
       loadComparison({ id: id }).then((res) => {
         this.formModel.fields = res.data.data;
       });

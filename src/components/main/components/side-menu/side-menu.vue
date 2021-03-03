@@ -13,7 +13,11 @@
     >
       <template v-for="item in menuList">
         <template v-if="item.children && item.children.length === 1">
-          <side-menu-item v-if="showChildren(item)" :key="`menu-${item.name}`" :parent-item="item"></side-menu-item>
+          <side-menu-item
+            v-if="showChildren(item)"
+            :key="`menu-${item.name}`"
+            :parent-item="item"
+          ></side-menu-item>
           <menu-item
             v-else
             :name="getNameOrHref(item, true)"
@@ -24,10 +28,18 @@
           </menu-item>
         </template>
         <template v-else>
-          <side-menu-item v-if="showChildren(item)" :key="`menu-${item.name}`" :parent-item="item"></side-menu-item>
-          <menu-item v-else :name="getNameOrHref(item)" :key="`menu-${item.name}`">
+          <side-menu-item
+            v-if="showChildren(item)"
+            :key="`menu-${item.name}`"
+            :parent-item="item"
+          ></side-menu-item>
+          <menu-item
+            v-else
+            :name="getNameOrHref(item)"
+            :key="`menu-${item.name}`"
+          >
             <common-icon :type="item.icon || ''" />
-            <span>{{ showTitle(item) }}</span>
+            <span>{{ showTitle(item)}}</span>
           </menu-item>
         </template>
       </template>
@@ -78,43 +90,43 @@ export default {
   mixins: [mixin],
   components: {
     SideMenuItem,
-    CollapsedMenu
+    CollapsedMenu,
   },
   props: {
     menuList: {
       type: Array,
       default() {
         return [];
-      }
+      },
     },
     collapsed: {
-      type: Boolean
+      type: Boolean,
     },
     theme: {
       type: String,
-      default: "dark"
+      default: "dark",
     },
     rootIconSize: {
       type: Number,
-      default: 20
+      default: 20,
     },
     iconSize: {
       type: Number,
-      default: 16
+      default: 16,
     },
     accordion: Boolean,
     activeName: {
       type: String,
-      default: ""
+      default: "",
     },
     openNames: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
-      openedNames: []
+      openedNames: [],
     };
   },
   methods: {
@@ -123,18 +135,18 @@ export default {
     },
     getOpenedNamesByActiveName(name) {
       return this.$route.matched
-        .map(item => item.name)
-        .filter(item => item !== name);
+        .map((item) => item.name)
+        .filter((item) => item !== name);
     },
     updateOpenName(name) {
       if (name === this.$config.homeName) this.openedNames = [];
       else this.openedNames = this.getOpenedNamesByActiveName(name);
-    }
+    },
   },
   computed: {
     textColor() {
       return this.theme === "dark" ? "#fff" : "#495060";
-    }
+    },
   },
   watch: {
     activeName(name) {
@@ -153,14 +165,14 @@ export default {
       this.$nextTick(() => {
         this.$refs.menu.updateOpened();
       });
-    }
+    },
   },
   mounted() {
     this.openedNames = getUnion(
       this.openedNames,
       this.getOpenedNamesByActiveName(name)
     );
-  }
+  },
 };
 </script>
 <style lang="less">

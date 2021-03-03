@@ -16,16 +16,19 @@
                     <Input
                       type="text"
                       search
+                      class="iptSearch"
+                      enter-button="搜索"
                       :clearable="true"
                       v-model="stores.record.query.kw"
+                      @on-search="handleSearchRecord"
                       placeholder="输入软件产品关键字搜索..."
-                      @on-search="handleSearchRecord()"
                     >
                       <Select
                         slot="prepend"
                         v-model="stores.record.query.customId"
-                        placeholder="选择业务员"
-                        @on-change="handleSearchRecord"
+                        clearable
+                        filterable
+                        placeholder="请选择客户"
                         style="width: 150px"
                       >
                         <Option
@@ -40,7 +43,6 @@
                         style="width: 165px"
                         placeholder="请选择日期"
                         size="small"
-                        @on-change="handleSearchRecord"
                         v-model="stores.record.query.beginDate"
                       ></DatePicker>
                       <DatePicker
@@ -49,7 +51,6 @@
                         style="width: 165px"
                         placeholder="请选择日期"
                         size="small"
-                        @on-change="handleSearchRecord"
                         v-model="stores.record.query.endDate"
                       ></DatePicker>
                     </Input>
@@ -120,11 +121,8 @@ export default {
             isDeleted: 0,
             status: -1,
             customId: -1,
-            beginDate: dayjs()
-              .add(-1, "year")
-              .startOf("year")
-              .format("YYYY-MM-DD"),
-            endDate: dayjs().add(-1, "year").endOf("year").format("YYYY-MM-DD"),
+            beginDate: dayjs().startOf("year").format("YYYY-MM-DD"),
+            endDate: dayjs().endOf("year").format("YYYY-MM-DD"),
             sort: [
               {
                 direct: "DESC",
@@ -278,5 +276,10 @@ export default {
 };
 </script>
 
-<style>
+<style lang='less' scope>
+.iptSearch {
+  .ivu-input-default {
+    height: 34px;
+  }
+}
 </style>

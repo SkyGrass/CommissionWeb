@@ -247,7 +247,7 @@ export default {
       this.showSelectTree();
     },
     showSelectTree() {
-      console.log("this.showTree=>" + this.showTree);
+
       if (this.showTree) {
         this.showTree = false;
       } else {
@@ -364,7 +364,6 @@ export default {
     } else {
       this.initQueryVal();
     }
-    console.log(this.cloneData)
     this.showData = JSON.parse(JSON.stringify(this.cloneData));
     this.queryData = this.showData;
   }

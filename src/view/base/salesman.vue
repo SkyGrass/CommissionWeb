@@ -284,7 +284,7 @@ export default {
               type: "string",
               required: true,
               message: "请输入业务员编码",
-              min: 3,
+              min: 1,
             },
           ],
           name: [
@@ -469,7 +469,6 @@ export default {
       return _valid;
     },
     doLoadSaleMan(id) {
-      console.log(id);
       loadSaleMan({ id: id }).then((res) => {
         this.formModel.fields = res.data.data;
       });

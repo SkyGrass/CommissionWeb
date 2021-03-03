@@ -141,7 +141,7 @@ export default {
               type: "string",
               required: true,
               message: "请输入软件产品编码",
-              min: 3,
+              min: 1,
             },
           ],
           name: [
@@ -241,7 +241,6 @@ export default {
       this.loadUserSalesmanList();
     },
     doLoadSoftWare(id) {
-      console.log(id);
       loadSoftWare({ id: id }).then((res) => {
         this.formModel.fields = res.data.data;
       });

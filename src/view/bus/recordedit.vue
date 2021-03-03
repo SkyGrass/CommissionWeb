@@ -50,7 +50,6 @@
               type="default"
               @click="initCustom"
               :loading="reloading"
-              v-if="canEdit"
               >重载</Button
             >
           </FormItem></Col
@@ -64,7 +63,7 @@
               clearable
               v-model="formModel.fields.fSalesmanId"
               placeholder="请选择业务员"
-              :disabled="haveBind || !canEdit"
+              :disabled="formModel.fields.fSalesmanId > -1"
             >
               <Option
                 v-for="item in salesmans"
@@ -123,8 +122,6 @@
         <Col span="2"
           ><Button type="info" @click="handleSubmit" v-show="canEdit"
             >保存</Button
-          ><Button type="warning" @click="resetForm" v-show="!canEdit"
-            >继续新增</Button
           ></Col
         >
       </Row>
@@ -158,7 +155,7 @@ import { createRecord } from "@/api/bus/record";
 import dayjs from "dayjs";
 import NP from "number-precision";
 export default {
-  name: `record_page`,
+  name: `record_edit_page`,
   data() {
     var self = this;
     return {
@@ -498,7 +495,6 @@ export default {
       curSelectRow: {},
       canEdit: false,
       reloading: false,
-      haveBind: false,
     };
   },
   computed: {
@@ -516,7 +512,7 @@ export default {
     },
     loadRecordInfo(id) {
       loadRecord({ id: id }).then((res) => {
-        res.data.data.fisCommissionV = res.data.data.fisCommissiom ? "1" : "0";
+        res.data.data.fisCommissionV = res.data.data.fIsCommission ? "1" : "0";
         this.formModel.fields = res.data.data;
       });
       loadRecordEntry({ id: id }).then((res) => {
@@ -552,7 +548,6 @@ export default {
         if (data) {
           const { salesmanId } = data;
           this.formModel.fields.fSalesmanId = salesmanId;
-          this.haveBind = salesmanId > -1;
         }
       });
     },
@@ -652,10 +647,6 @@ export default {
       });
     },
     beforeSave() {
-      if (this.formModel.fields.fCustomId < 0) {
-        this.$Message.error("客户尚未选择!");
-        return false;
-      }
       if (this.list.length <= 0 || this.list.some((f) => f.fSoftwareId == -1)) {
         this.$Message.error("表体信息不完整!");
         return false;
@@ -672,20 +663,6 @@ export default {
       }
 
       return true;
-    },
-    resetForm() {
-      this.canEdit = true;
-      this.initBillNo();
-      this.initCustom();
-      this.initSalesman();
-
-      this.list = [];
-      this.formModel.fields.fId = -1;
-      this.formModel.fields.fCustomId = -1;
-      this.formModel.fields.fConfirmerId = -1;
-      this.formModel.fields.fRemark = "";
-      this.formModel.fields.fSalesmanId = -1;
-      this.initUserBind(this.$store.state.user.userGuid);
     },
   },
   mounted() {
