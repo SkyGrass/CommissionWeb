@@ -300,7 +300,7 @@ export default {
         {
           width: 150,
           key: "fDcRate",
-          title: "成交折扣",
+          title: "提成比例",
           align: "center",
         },
         {

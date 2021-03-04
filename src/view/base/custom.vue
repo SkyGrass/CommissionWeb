@@ -273,6 +273,7 @@
 <script>
 import DzTable from "_c/tables/dz-table.vue";
 import {
+  genCode,
   getCustomList,
   createCustom,
   loadCustom,
@@ -450,6 +451,15 @@ export default {
         this.stores.custom.query.totalCount = res.data.totalCount;
       });
     },
+    initCode() {
+      genCode({}).then((res) => {
+        if (res.data.state == "success") {
+          this.formModel.fields.code = res.data.data;
+        } else {
+          this.$Message.warning(res.data.message);
+        }
+      });
+    },
     handleOpenFormWindow() {
       this.formModel.opened = true;
     },
@@ -458,6 +468,7 @@ export default {
     },
     handleSwitchFormModeToCreate() {
       this.formModel.mode = "create";
+      this.initCode();
     },
     handleSwitchFormModeToEdit() {
       this.formModel.mode = "edit";

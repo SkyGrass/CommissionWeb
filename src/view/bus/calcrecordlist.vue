@@ -265,6 +265,12 @@ export default {
               },
             },
             {
+              title: "客户名称",
+              key: "fCustomName",
+              align: "center",
+              width: 150,
+            },
+            {
               title: "业务员",
               key: "fSalesmanId",
               align: "center",
