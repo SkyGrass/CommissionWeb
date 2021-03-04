@@ -62,12 +62,12 @@
                     title="删除"
                     @click="handleBatchCommand('delete')"
                   ></Button>
-                  <Button
+                  <!-- <Button
                     class="txt-success"
                     icon="md-redo"
                     title="恢复"
                     @click="handleBatchCommand('recover')"
-                  ></Button>
+                  ></Button> -->
                   <Button
                     class="txt-danger"
                     icon="md-hand"

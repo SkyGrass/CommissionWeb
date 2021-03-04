@@ -16,7 +16,6 @@
                     <Input
                       type="text"
                       search
-                      :clearable="true"
                       class="iptSearch"
                       enter-button="搜索"
                       v-model="stores.record.query.kw"
@@ -56,6 +55,12 @@
                   </FormItem>
                 </Form>
               </Col>
+              <Col span="3">
+                <h4>
+                  提成合计：<strong>{{ total }}</strong
+                  >￥
+                </h4></Col
+              >
               <Col span="8" class="dnc-toolbar-btns">
                 <Button
                   v-can="'export'"
@@ -183,6 +188,7 @@ import dayjs from "dayjs";
 import { getAllSalesman } from "@/api/base/saleman";
 import { b64toFile } from "@/libs/tools";
 import { saveAs } from "file-saver";
+import NP from "number-precision";
 export default {
   name: "calc_record_list_page",
   components: {
@@ -291,25 +297,19 @@ export default {
             {
               title: "合同总金额",
               key: "fContractPrice",
-              align: "center",
-              width: 120,
-            },
-            {
-              title: "合同总金额",
-              key: "fContractPrice",
               align: "right",
-              width: 120,
+              width: 100,
             },
             {
               title: "模块标准价",
               key: "fStandardPrice",
               align: "right",
-              width: 120,
+              width: 100,
             },
             {
               title: "成交折扣",
               key: "fDcRate",
-              align: "center",
+              align: "right",
               width: 80,
             },
             {
@@ -337,20 +337,6 @@ export default {
               width: 120,
             },
             { title: "备注", key: "fRemark", width: 150 },
-            // {
-            //   title: "是否计提",
-            //   key: "fIsCommission",
-            //   align: "center",
-            //   width: 120,
-            //   slot: "fIsCommission",
-            // },
-            // {
-            //   title: "审批状态",
-            //   key: "fStatus",
-            //   align: "center",
-            //   width: 120,
-            //   slot: "fStatus",
-            // },
             {
               title: "单据状态",
               key: "fIsDeleted",
@@ -381,6 +367,7 @@ export default {
       salesmans: [],
       loadingSearchSalesman: false,
       defaultData: [{ id: -1, name: "全部", value: -1, text: "全部" }],
+      total: 0,
     };
   },
   computed: {
@@ -410,6 +397,13 @@ export default {
         })
       ).then((res) => {
         this.stores.record.data = res.data.data;
+        let sum = 0;
+        if (Array.isArray(res.data.data)) {
+          res.data.data.forEach((row) => {
+            sum = NP.plus(sum, row.fTotal);
+          });
+        }
+        this.total = sum.toFixed(2);
         this.stores.record.query.totalCount = res.data.totalCount;
       });
     },

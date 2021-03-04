@@ -111,6 +111,12 @@
                   </FormItem>
                 </Form>
               </Col>
+              <Col span="3">
+                <h4
+                  >合同金额合计：<strong>{{ total }}</strong
+                  >￥</h4
+                ></Col
+              >
               <Col span="8" class="dnc-toolbar-btns">
                 <Button
                   v-can="'export'"
@@ -284,6 +290,7 @@ import { getAllCustom } from "@/api/base/custom";
 import { getAllSalesman } from "@/api/base/saleman";
 import { b64toFile } from "@/libs/tools";
 import { saveAs } from "file-saver";
+import NP from "number-precision";
 export default {
   name: "record_list_page",
   components: {
@@ -466,12 +473,6 @@ export default {
               width: 120,
             },
             {
-              title: "合同总金额",
-              key: "fContractPrice",
-              align: "right",
-              width: 120,
-            },
-            {
               title: "模块标准价",
               key: "fStandardPrice",
               align: "right",
@@ -536,6 +537,7 @@ export default {
       customs: [],
       loadingSearchSalesman: false,
       defaultData: [{ id: -1, name: "全部", value: -1, text: "全部" }],
+      total: 0,
     };
   },
   computed: {
@@ -572,6 +574,13 @@ export default {
         })
       ).then((res) => {
         this.stores.record.data = res.data.data;
+        let sum = 0;
+        if (Array.isArray(res.data.data)) {
+          res.data.data.forEach((row) => {
+            sum = NP.plus(sum, row.fContractPrice);
+          });
+        }
+        this.total = sum.toFixed(2);
         this.stores.record.query.totalCount = res.data.totalCount;
       });
     },

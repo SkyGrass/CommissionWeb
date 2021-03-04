@@ -18,7 +18,6 @@
                       search
                       class="iptSearch"
                       enter-button="搜索"
-                      :clearable="true"
                       v-model="stores.record.query.kw"
                       placeholder="输入软件产品关键字搜索..."
                       @on-search="handleSearchRecord"
@@ -55,6 +54,12 @@
                   </FormItem>
                 </Form>
               </Col>
+              <Col span="3">
+                <h4>
+                  提成合计：<strong>{{ total }}</strong
+                  >￥
+                </h4></Col
+              >
               <Col span="8" class="dnc-toolbar-btns">
                 <Button
                   v-can="'create'"
@@ -98,6 +103,7 @@ import dayjs from "dayjs";
 import { getAllSalesman } from "@/api/base/saleman";
 import { b64toFile } from "@/libs/tools";
 import { saveAs } from "file-saver";
+import NP from "number-precision";
 export default {
   name: "employee_commision_report",
   components: {
@@ -155,7 +161,7 @@ export default {
             {
               title: "合同总金额",
               key: "fContractPrice",
-              align: "center",
+              align: "right",
               width: 120,
             },
             {
@@ -195,6 +201,7 @@ export default {
 
       salesmans: [],
       defaultData: [{ id: -1, name: "全部", value: -1, text: "全部" }],
+      total: 0,
     };
   },
   computed: {
@@ -224,6 +231,13 @@ export default {
         })
       ).then((res) => {
         this.stores.record.data = res.data.data;
+        let sum = 0;
+        if (Array.isArray(res.data.data)) {
+          res.data.data.forEach((row) => {
+            sum = NP.plus(sum, row.fTotal);
+          });
+        }
+        this.total = sum.toFixed(2);
         this.stores.record.query.totalCount = res.data.totalCount;
       });
     },
