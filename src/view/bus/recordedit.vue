@@ -63,7 +63,7 @@
               clearable
               v-model="formModel.fields.fSalesmanId"
               placeholder="请选择业务员"
-              :disabled="formModel.fields.fSalesmanId > -1"
+              :disabled="haveBind || !canEdit"
             >
               <Option
                 v-for="item in salesmans"
@@ -495,6 +495,7 @@ export default {
       curSelectRow: {},
       canEdit: false,
       reloading: false,
+      haveBind: false,
     };
   },
   computed: {
@@ -548,6 +549,7 @@ export default {
         if (data) {
           const { salesmanId } = data;
           this.formModel.fields.fSalesmanId = salesmanId;
+          this.haveBind = salesmanId > -1;
         }
       });
     },

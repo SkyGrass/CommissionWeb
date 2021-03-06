@@ -50,7 +50,7 @@
                         >
                       </Select>
 
-                      <Select
+                      <!-- <Select
                         slot="prepend"
                         v-model="stores.record.query.customId"
                         placeholder="输入关键字选择客户"
@@ -64,7 +64,7 @@
                           :key="index"
                           >{{ option.text }}</Option
                         >
-                      </Select>
+                      </Select> -->
                       <Select
                         slot="prepend"
                         v-model="stores.record.query.salesmanId"
@@ -94,7 +94,7 @@
                       <DatePicker
                         slot="prepend"
                         type="date"
-                        style="width: 165px"
+                        style="width: 145px"
                         placeholder="请选择日期"
                         size="small"
                         v-model="stores.record.query.beginDate"
@@ -102,7 +102,7 @@
                       <DatePicker
                         slot="prepend"
                         type="date"
-                        style="width: 165px"
+                        style="width: 145px"
                         placeholder="请选择日期"
                         size="small"
                         v-model="stores.record.query.endDate"
