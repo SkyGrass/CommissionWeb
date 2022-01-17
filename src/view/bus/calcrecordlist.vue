@@ -313,6 +313,12 @@ export default {
               width: 80,
             },
             {
+              width: 150,
+              key: "fProportion",
+              title: "提成比例",
+              align: "center",
+            },
+            {
               title: "提成金额",
               key: "fCommissionPrice",
               align: "right",

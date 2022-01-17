@@ -28,12 +28,14 @@
                         placeholder="客户状态"
                         style="width: 80px"
                       >
-                        <Option
-                          v-for="item in stores.record.sources.statusSources"
-                          :value="item.value"
-                          :key="item.value"
-                          >{{ item.text }}</Option
-                        >
+                        <OptionGroup label="客户状态">
+                          <Option
+                            v-for="item in stores.record.sources.statusSources"
+                            :value="item.value"
+                            :key="item.value"
+                            >{{ item.text }}</Option
+                          >
+                        </OptionGroup>
                       </Select>
                       <Select
                         slot="prepend"
@@ -41,13 +43,15 @@
                         placeholder="计提状态"
                         style="width: 80px"
                       >
-                        <Option
-                          v-for="item in stores.record.sources
-                            .commissionSources"
-                          :value="item.value"
-                          :key="item.value"
-                          >{{ item.text }}</Option
-                        >
+                        <OptionGroup label="计提状态">
+                          <Option
+                            v-for="item in stores.record.sources
+                              .commissionSources"
+                            :value="item.value"
+                            :key="item.value"
+                            >{{ item.text }}</Option
+                          >
+                        </OptionGroup>
                       </Select>
 
                       <!-- <Select
@@ -71,12 +75,14 @@
                         placeholder="选择业务员"
                         style="width: 150px"
                       >
-                        <Option
-                          v-for="(option, index) in salesmans"
-                          :value="option.id"
-                          :key="index"
-                          >{{ option.text }}</Option
-                        >
+                        <OptionGroup label="业务员">
+                          <Option
+                            v-for="(option, index) in salesmans"
+                            :value="option.id"
+                            :key="index"
+                            >{{ option.text }}</Option
+                          >
+                        </OptionGroup>
                       </Select>
                       <Select
                         slot="prepend"
@@ -84,12 +90,14 @@
                         v-model="stores.record.query.confirmerId"
                         style="width: 150px"
                       >
-                        <Option
-                          v-for="(option, index) in salesmans"
-                          :value="option.id"
-                          :key="index"
-                          >{{ option.text }}</Option
-                        >
+                        <OptionGroup label="经办人">
+                          <Option
+                            v-for="(option, index) in salesmans"
+                            :value="option.id"
+                            :key="index"
+                            >{{ option.text }}</Option
+                          >
+                        </OptionGroup>
                       </Select>
                       <DatePicker
                         slot="prepend"
@@ -112,10 +120,10 @@
                 </Form>
               </Col>
               <Col span="3">
-                <h4
-                  >合同金额合计：<strong>{{ total }}</strong
-                  >￥</h4
-                ></Col
+                <h4>
+                  合同金额合计：<strong>{{ total }}</strong
+                  >￥
+                </h4></Col
               >
               <Col span="8" class="dnc-toolbar-btns">
                 <Button

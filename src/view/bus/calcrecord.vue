@@ -98,14 +98,11 @@
       width="80%"
       :style="modalStyle"
       :mask-closable="false"
+      footer-hide
     >
-      <div slot="footer">
-        <Button type="warning" @click="showModal = false">取消</Button>
-        <Button type="primary" @click="onConfirmChoose">确定</Button>
-      </div>
       <div style="height: 600px">
         <Row>
-          <Col style="margin-bottom: 10px">
+          <Col style="margin-bottom: 10px" span="16">
             <DatePicker
               type="date"
               style="width: 145px"
@@ -144,6 +141,17 @@
               @click="loadRecordList"
               >查询</Button
             >
+          </Col>
+          <Col span="4" push="5">
+            <Row justify="right" gutter="10">
+              <Button
+                type="warning"
+                @click="showModal = false"
+                style="margin-right: 5px"
+                >取消</Button
+              >
+              <Button type="primary" @click="onConfirmChoose">确定</Button>
+            </Row>
           </Col>
         </Row>
         <Card>
@@ -300,6 +308,12 @@ export default {
         {
           width: 150,
           key: "fDcRate",
+          title: "成交折扣",
+          align: "center",
+        },
+        {
+          width: 150,
+          key: "fProportion",
           title: "提成比例",
           align: "center",
         },
@@ -336,9 +350,8 @@ export default {
                         },
                         on: {
                           "on-change": (e) => {
-                            let fCommissionPrice = this.list[index][
-                              "fCommissionPrice"
-                            ];
+                            let fCommissionPrice =
+                              this.list[index]["fCommissionPrice"];
                             fCommissionPrice = NP.plus(fCommissionPrice, e);
                             this.list[index][key] = e;
                             let t = this.list[index];
@@ -588,7 +601,7 @@ export default {
         this.$Message.error("表体信息不完整!");
         return false;
       }
-      let tmp = [...this.list].map((f) => {
+      /*let tmp = [...this.list].map((f) => {
         return f.fSoftwareId;
       });
       let len = tmp.length;
@@ -597,7 +610,7 @@ export default {
         this.$Message.error("表体出现重复行!!");
         this.$Modal.remove();
         return false;
-      }
+      }*/
 
       return true;
     },
@@ -661,7 +674,8 @@ export default {
           content: "<p>确定要选择这些记录吗?</p>",
           loading: true,
           onOk: () => {
-            this.formModel.fields.fSalesmanId = this.stores.record.query.salesmanId;
+            this.formModel.fields.fSalesmanId =
+              this.stores.record.query.salesmanId;
             this.showModal = false;
             let ids = this.formModel.selection
               .map((m) => {

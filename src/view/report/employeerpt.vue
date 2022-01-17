@@ -177,8 +177,20 @@ export default {
               width: 120,
             },
             {
+              width: 120,
+              key: "fProportion",
+              title: "提成比例",
+              align: "center",
+            },
+            {
               title: "提成金额",
               key: "fCommissionPrice",
+              align: "right",
+              width: 120,
+            },
+            {
+              title: "成交折扣",
+              key: "fDcRate",
               align: "right",
               width: 120,
             },
